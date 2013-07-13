@@ -31,9 +31,20 @@
 @section('content')
 <div class="row">
 	<div class="span7">
-		<h3>{{ $can->author->fullname() }} can </h3>
+		<h3>{{ $can->author->fullname() }} can 
+			@if($userAlreadyWantThis)
+				<a href="#" class="btn btn-danger disabled pull-right" type="button">You Want</a>
+			@else
+				@if (Sentry::check())
+					<a href="{{ URL::to('account/cans/can', array($can->id)) }}" class="btn btn-danger pull-right" type="button">I Want</a>
+				@else
+					<a href="{{ URL::to('auth/signin') }}" class="btn btn-danger pull-right" type="button">Log in</a>
+				@endif
+			@endif
+		</h3>
 
-		<p>{{ $can->content() }}</p>
+		<p>{{ $can->content() }} </p>
+	
 		<div>
 			<span class="badge badge-info" title="{{ $can->created_at }}">Created {{ $can->created_at->diffForHumans() }}</span>
 		</div>
@@ -73,9 +84,15 @@
 <hr />
 
 <div class="row">
-	<!-- People can-->
+	<!-- People want-->
 	<div class="span11">
-
+		<h4>Other People Want</h4>	
+		@foreach ($userswant as $user )
+			<div class="span1">
+				<a href="{{ URL::to('user', array($user->getUser->id)) }}"><img class="thumbnail" src="{{ $user->getUser->gravatar() }}" alt="{{ $user->getUser->fullName() }}"></a>
+			</div>
+		@endforeach
+		
 	</div>
 
 </div>

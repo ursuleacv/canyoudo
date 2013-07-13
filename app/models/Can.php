@@ -80,4 +80,10 @@ class Can extends Eloquent {
 		return 'http://lorempixel.com/130/90/business/';
 	}
 
+	public function userswant()
+	{
+		return $this->hasMany('UserWant','can_id');
+	}
+
+	
 }

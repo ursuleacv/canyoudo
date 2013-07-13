@@ -4,6 +4,7 @@ use AuthorizedController;
 use Input;
 use Lang;
 use Can;
+use DB;
 use Redirect;
 use Sentry;
 use Str;
@@ -37,7 +38,7 @@ class CansController extends AuthorizedController {
 		// Declare the rules for the form validation
 		$rules = array(
 			'content' => 'required|min:3',
-		);
+			);
 
 		// Create a new validator instance from our validation rules
 		$validator = Validator::make(Input::all(), $rules);
@@ -132,10 +133,10 @@ class CansController extends AuthorizedController {
 					{	
 					//try catch	 ?
 						$adapter->setUserStatus('I #can '. Str::limit($can->content, 90) . ' Read more '.$json->id);
-					
+
 					}//if
 				}//else
-			
+
 			}// if not empty provider
 
 			// Redirect to the new can can page
@@ -146,5 +147,58 @@ class CansController extends AuthorizedController {
 		return Redirect::to('/')->with('error', Lang::get('admin/cans/message.create.error'));
 	}
 
+	/**
+	*	A user clicked IWant 
+	*	The user wants a specific Can
+	**/
+	public function getCan ($can_id)
+	{
+		
+		// Save what the user want
+		$user_id = Sentry::getUser()->id;
 
+		//Check if the user and the current want exist
+		$UserAndWantExist = DB::table('users_want')// ?? table want
+		->where('user_id','=',$user_id)
+		->where('can_id','=',$can_id)->get(); // ?? id for can
+		
+		if (empty($UserAndWantExist)){
+			//insert user_id  and can_id in users_want table
+			DB::table('users_want')->insert(
+				array(
+					'user_id' => $user_id, 
+					'can_id' => $can_id)
+				);
+		}	
+			// Get this can can data
+		$can = Can::with(array(
+			'author' => function($query)
+			{
+				$query->withTrashed();
+			},
+			'comments'
+			))->where('id', $can_id)->first();
+
+			// Check if the can can exists
+		if (is_null($can))
+		{
+				// If we ended up in here, it means that a page or a can can
+				// don't exist. So, this means that it is time for 404 error page.
+			return App::abort(404);
+		}
+
+			// Get this can comments
+		$comments = $can->comments()->with(array(
+			'author' => function($query)
+			{
+				$query->withTrashed();
+			},
+			))->orderBy('created_at', 'DESC')->get();
+
+
+			//print_r($userswant);
+			// Show the page
+		return View::make('frontend/account/cans/view-can', compact('can', 'comments'));
+		
+	}
 }

@@ -36,7 +36,7 @@ class CanController extends BaseController {
 			{
 				$query->withTrashed();
 			},
-			'comments',
+			'comments', 'userswant',
 		))->where('slug', $slug)->first();
 
 		// Check if the can can exists
@@ -55,8 +55,22 @@ class CanController extends BaseController {
 			},
 		))->orderBy('created_at', 'DESC')->get();
 
+		// Get users want this can
+		$userswant = $can->userswant()->with('getUser'
+		)->orderBy('created_at', 'DESC')->get();
+
+		$userAlreadyWantThis = false;
+		if (Sentry::check()){
+			//get the logged in user's id
+			$user_id = Sentry::getUser()->id;
+			$usrIds = array();	
+			foreach ($userswant as $user) {
+				array_push($usrIds , $user->user_id);
+			}
+			$userAlreadyWantThis = in_array($user_id, $usrIds) ? true : false;
+		}	
 		// Show the page
-		return View::make('frontend/can/view-can', compact('can', 'comments'));
+		return View::make('frontend/can/view-can', compact('can', 'comments','userswant','userAlreadyWantThis'));
 	}
 
 	/**
@@ -106,5 +120,6 @@ class CanController extends BaseController {
 		// Redirect to this can can page
 		return Redirect::to("can/$slug#comments")->with('error', 'There was a problem adding your comment, please try again.');
 	}
+
 
 }

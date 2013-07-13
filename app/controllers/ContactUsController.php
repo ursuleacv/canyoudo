@@ -34,8 +34,32 @@ class ContactUsController extends BaseController {
 		{
 			return Redirect::route('contact-us')->withErrors($validator);
 		}
+		
+		// to do sending the message to email
 
 		return Redirect::route('contact-us')->with('success', 'The message has been sent successfully');
+	}
+
+	public function postEmail()
+	{
+		// Declare the rules for the form validation
+		$rules = array(			
+			'email'       => 'required|email'
+		);
+
+		// Create a new validator instance from our validation rules
+		$validator = Validator::make(Input::all(), $rules);
+
+		// If validation fails, we'll exit the operation now.
+		if ($validator->fails())
+		{
+			return Redirect::to('/')->withErrors($validator);
+		}
+
+		DB::table('landing')->insert(
+  		  array('email' => Input::get('email'))
+		);
+		return Redirect::to('/')->with('success', 'The email address has been sent successfully. We will let you know when you can try the beta version. Thank You!');
 	}
 
 }

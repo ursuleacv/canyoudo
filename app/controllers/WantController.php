@@ -36,7 +36,7 @@ class WantController extends BaseController {
 			{
 				$query->withTrashed();
 			},
-			'comments',
+			'comments', 'userscan',
 		))->where('slug', $slug)->first();
 
 		// Check if the want want exists
@@ -55,8 +55,23 @@ class WantController extends BaseController {
 			},
 		))->orderBy('created_at', 'DESC')->get();
 
+		// Get users want this can
+		$userscan = $want->userscan()->with('getUser'
+		)->orderBy('created_at', 'DESC')->get();
+
+		$userAlreadyCanThis = false;
+		if (Sentry::check()){
+			//get the logged in user's id
+			$user_id = Sentry::getUser()->id;			
+			$usrIds = array();
+			foreach ($userscan as $user) {
+				array_push($usrIds , $user->user_id);
+			}
+			
+			$userAlreadyCanThis = in_array($user_id, $usrIds) ? true : false;
+		}	
 		// Show the page
-		return View::make('frontend/want/view-want', compact('want', 'comments'));
+		return View::make('frontend/want/view-want', compact('want', 'comments', 'userscan','userAlreadyCanThis'));
 	}
 
 	/**

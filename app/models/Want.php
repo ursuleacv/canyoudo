@@ -81,4 +81,10 @@ class Want extends Eloquent {
 		return 'http://lorempixel.com/130/90/business/';
 	}
 
+	public function userscan()
+	{
+		return $this->hasMany('UserCan','want_id');
+	}
+
+	
 }

@@ -30,21 +30,10 @@
 @section('content')
 <div class="row">
 	<div class="span7">
-		<h3>{{ $want->author->fullname() }} wants 
-			@if($userAlreadyCanThis)
-				<a href="#" class="btn btn-primary disabled pull-right" type="button">You Can</a>
-			@else
-				@if (Sentry::check())
-					<a href="{{ URL::to('account/wants/want', array($want->id)) }}" class="btn btn-primary pull-right" type="button">I Can</a>
-				@else
-					<a href="{{ URL::to('auth/signin') }}" class="btn btn-danger pull-right" type="button">Log in</a>
-				@endif
-				
-			@endif
-		</h3>
+		<h3>{{ $want->author->fullname() }} wants</h3>
 
 		<p>{{ $want->content() }}</p>
-		
+		<p><a href="{{ URL::to('account/wants/want', array($want->id)) }}"> I can </a></p>
 		<div>
 			<span class="badge badge-info" title="{{ $want->created_at }}">wanted {{ $want->created_at->diffForHumans() }}</span>
 		</div>
@@ -84,14 +73,9 @@
 <hr />
 
 <div class="row">
-	<!-- People want-->	
+	<!-- People want-->
 	<div class="span11">
-	<h4>Other People Can</h4>
-		@foreach ($userscan as $user )
-			<div class="span1">
-				<a href="{{ URL::to('user', array($user->getUser->id)) }}"><img class="thumbnail" src="{{ $user->getUser->gravatar() }}" alt="{{ $user->getUser->fullName() }}"></a>
-			</div>
-		@endforeach
+
 	</div>
 
 </div>

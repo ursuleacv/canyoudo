@@ -4,6 +4,7 @@ use AuthorizedController;
 use Input;
 use Lang;
 use Want;
+use DB;
 use Redirect;
 use Sentry;
 use Str;
@@ -145,6 +146,59 @@ class WantsController extends AuthorizedController {
 		return Redirect::to('/')->with('error', Lang::get('admin/wants/message.create.error'));
 		
 	}
+	
+	/**
+	*	A user clicked ICan
+	*	The user can a specific Want
+	**/
+	public function getWant ($want_id)
+	{
+		
+		// Save what the user want
+		
+		$user_id = Sentry::getUser()->id;
+		
+		$UserAndWantExist = DB::table('users_can')
+					->where('user_id','=',$user_id)
+					->where('want_id','=',$want_id)->get();
 
+		if (empty($UserAndWantExist)){
+			//insert user_id  and want_id in users_can table
+			DB::table('users_can')->insert(
+	  		  array(
+	  		  	'user_id' => $user_id, 
+	  		  	'want_id' => $want_id)
+			);
+		}
+			// Get this can can data
+			$want = Want::with(array(
+				'author' => function($query)
+				{
+					$query->withTrashed();
+				},
+				'comments'
+			))->where('id', $want_id)->first();
 
+			// Check if the can can exists
+			if (is_null($want))
+			{
+				// If we ended up in here, it means that a page or a can can
+				// don't exist. So, this means that it is time for 404 error page.
+				return App::abort(404);
+			}
+
+			// Get this can comments
+			$comments = $want->comments()->with(array(
+				'author' => function($query)
+				{
+					$query->withTrashed();
+				},
+			))->orderBy('created_at', 'DESC')->get();
+
+			
+			//print_r($userswant);
+			// Show the page
+			return View::make('frontend/account/wants/view-want', compact('want', 'comments'));
+		
+	}
 }

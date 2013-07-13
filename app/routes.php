@@ -120,6 +120,8 @@ Route::group(array('prefix' => 'account'), function()
 		
 		Route::get('create', array('as' => 'create/want', 'uses' => 'Controllers\Account\WantsController@getCreate'));
 		Route::post('create', 'Controllers\Account\WantsController@postCreate');
+
+		Route::get('want/{postSlug}', array('as' => 'want', 'uses' => 'Controllers\Account\WantsController@getWant'));
 	});
 	
 	# Can Management
@@ -128,6 +130,7 @@ Route::group(array('prefix' => 'account'), function()
 		Route::get('create', array('as' => 'create/can', 'uses' => 'Controllers\Account\CansController@getCreate'));
 		Route::post('create', 'Controllers\Account\CansController@postCreate');
 		
+		Route::get('can/{postSlug}', array('as' => 'can', 'uses' => 'Controllers\Account\CansController@getCan'));
 	});
 
 	# Account Dashboard
@@ -178,7 +181,13 @@ Route::post('can/{postSlug}', 'CanController@canView');
 
 Route::get('user/{userid}', array('as' => 'user', 'uses' => 'UserController@getUser'));
 
-Route::get('/', array('as' => 'home', 'uses' => 'HomeController@getIndex'));
+Route::get('/home', array('as' => 'home', 'uses' => 'HomeController@getIndex'));
+
+Route::get('/', function()
+{	
+	return View::make('frontend/landing');
+});
+Route::post('landing', 'ContactUsController@postEmail');
 
 Route::get('feed', array('uses' => 'FeedController@getIndex' ));
 Route::get('sitemap', array('uses' => 'SitemapController@getIndex' ));

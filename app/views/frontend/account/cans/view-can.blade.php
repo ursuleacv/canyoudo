@@ -2,25 +2,26 @@
 
 {{-- Page title --}}
 @section('title')
-	{{ $want->author->first_name }} wants {{ $want->title }} - Can You Do It?
+	{{ $can->author->first_name }} can {{ $can->title }} - Do You Want?
 @stop
 
 {{-- Update the Meta Author --}}
 @section('author')
-<meta name="author" content="{{ $want->author->fullName() }}" /> 
+<meta name="author" content="{{ $can->author->fullName() }}" /> 
 @stop
 {{-- Update the Meta Description --}}
 @section('meta_description')
-@if ($want->meta_description )
-<meta name="description" content="{{ $want->meta_description }}" />
+@if ($can->meta_description )
+<meta name="description" content="{{ $can->meta_description }}" />
 @else
 @parent
 @endif
 @stop
+
 {{-- Update the Meta Keywords --}}
 @section('meta_keywords')
-@if ($want->meta_keywords )
-<meta name="keywords" content="{{ $want->meta_keywords }}" />
+@if ($can->meta_keywords )
+<meta name="keywords" content="{{ $can->meta_keywords }}" />
 @else
 @parent
 @endif
@@ -30,25 +31,13 @@
 @section('content')
 <div class="row">
 	<div class="span7">
-		<h3>{{ $want->author->fullname() }} wants 
-			@if($userAlreadyCanThis)
-				<a href="#" class="btn btn-primary disabled pull-right" type="button">You Can</a>
-			@else
-				@if (Sentry::check())
-					<a href="{{ URL::to('account/wants/want', array($want->id)) }}" class="btn btn-primary pull-right" type="button">I Can</a>
-				@else
-					<a href="{{ URL::to('auth/signin') }}" class="btn btn-danger pull-right" type="button">Log in</a>
-				@endif
-				
-			@endif
-		</h3>
+		<h3>{{ $can->author->fullname() }} can </h3>
 
-		<p>{{ $want->content() }}</p>
-		
+		<p>{{ $can->content() }}</p>
+		<p><a href="{{ URL::to('account/wants/want', array($can->id)) }}"> I want </a></p>
 		<div>
-			<span class="badge badge-info" title="{{ $want->created_at }}">wanted {{ $want->created_at->diffForHumans() }}</span>
+			<span class="badge badge-info" title="{{ $can->created_at }}">Created {{ $can->created_at->diffForHumans() }}</span>
 		</div>
-		
 			<!-- AddThis Button BEGIN -->
 			<div class="addthis_toolbox addthis_default_style addthis_16x16_style pull-right">
 			<a class="addthis_button_facebook"></a>
@@ -59,23 +48,24 @@
 			</div>
 			<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=undefined" async></script>
 			<!-- AddThis Button END -->
+
 	</div>
 	<div class="span4">
 		<div class="row">
 			<div class="span1">
-				<img class="thumbnail" src="{{ $want->author->gravatar() }}" alt="">
+				<img class="thumbnail" src="{{ $can->author->gravatar() }}" alt="">
 			</div>
 			<div class="span3">
-				<h4><a href="{{ URL::to('user', array($want->author->id)) }}">{{ $want->author->fullName() }} </a></h4>
+				<h4><a href="{{ URL::to('user', array($can->author->id)) }}">{{ $can->author->fullName() }} </a></h4>
 				<div>
-					@if ($want->author->profileURL == '')
+					@if ($can->author->profileURL == '')
 					No public profile
 					@else
-					<a href="{{ $want->author->profileURL }}">{{ $want->author->profileURL }} </a>
+					<a href="{{ $can->author->profileURL }}">{{ $can->author->profileURL }} </a>
 					@endif
 				</div>
-				
-				<p>Last visit: {{ $want->author->updated_at->diffForHumans() }}</p>
+
+				<p>Last visit: {{ $can->author->updated_at->diffForHumans() }}</p>
 			</div>
 		</div>	
 	</div>
@@ -84,14 +74,9 @@
 <hr />
 
 <div class="row">
-	<!-- People want-->	
+	<!-- People can-->
 	<div class="span11">
-	<h4>Other People Can</h4>
-		@foreach ($userscan as $user )
-			<div class="span1">
-				<a href="{{ URL::to('user', array($user->getUser->id)) }}"><img class="thumbnail" src="{{ $user->getUser->gravatar() }}" alt="{{ $user->getUser->fullName() }}"></a>
-			</div>
-		@endforeach
+
 	</div>
 
 </div>
@@ -109,7 +94,7 @@
 	<div class="span11">
 		<div class="row">
 			<div class="span11">
-				<a href="{{ URL::to('user', array($comment->author->id)) }}"> <span class="muted">{{ $comment->author->fullName() }}</span></a>
+				<a href="{{ URL::to('user', array($comment->author->id)) }}"><span class="muted">{{ $comment->author->fullName() }}</span></a>
 				&bull;
 				<span title="{{ $comment->created_at }}">{{ $comment->created_at->diffForHumans() }}</span>
 
@@ -132,7 +117,7 @@ You need to be logged in to add comments.<br /><br />
 Click <a href="{{ route('signin') }}">here</a> to login into your account.
 @else
 <h4>Add a Comment</h4>
-<form method="post" action="{{ route('view-want', $want->slug) }}">
+<form method="post" action="{{ route('view-can', $can->slug) }}">
 	<!-- CSRF Token -->
 	<input type="hidden" name="_token" value="{{ csrf_token() }}" />
 
