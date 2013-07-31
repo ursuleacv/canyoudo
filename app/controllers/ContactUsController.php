@@ -36,6 +36,13 @@ class ContactUsController extends BaseController {
 		}
 		
 		// to do sending the message to email
+		DB::table('messages')->insert(
+  		  	array(
+  		  		'name' =>  Input::get('name'),
+  		  		'email' => Input::get('email'),
+  		  		'description' => Input::get('description'),
+  		  		'created_at' => date('Y-m-d H:i:s')
+  		  	));
 
 		return Redirect::route('contact-us')->with('success', 'The message has been sent successfully');
 	}
